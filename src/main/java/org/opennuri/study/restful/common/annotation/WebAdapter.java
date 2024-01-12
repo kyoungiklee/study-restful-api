@@ -1,4 +1,4 @@
-package org.opennuri.study.architecture.common;
+package org.opennuri.study.restful.common.annotation;
 
 
 import org.springframework.core.annotation.AliasFor;

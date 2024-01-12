@@ -1,10 +1,11 @@
-package org.opennuri.study.restful.events;
+package org.opennuri.study.restful.events.domain;
 
 
 import org.junit.jupiter.api.Test;
 import org.opennuri.study.restful.events.domain.Event;
 import org.opennuri.study.restful.events.domain.EventStatus;
 
+import java.sql.DataTruncation;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,10 +43,10 @@ class EventTest {
                 new Event.Id(1L),
                 new Event.Name(name),
                 new Event.Description(description),
-                new Event.BeginEnrollmentDateTime(null),
-                new Event.CloseEnrollmentDateTime(null),
-                new Event.BeginEventDateTime(null),
-                new Event.EndEventDateTime(null),
+                new Event.BeginEnrollmentDateTime(LocalDateTime.of(2021, 8, 1, 0, 0, 0)),
+                new Event.CloseEnrollmentDateTime(LocalDateTime.of(2021, 8, 2, 0, 0, 0)),
+                new Event.BeginEventDateTime(LocalDateTime.of(2021, 8, 3, 0, 0, 0)),
+                new Event.EndEventDateTime(LocalDateTime.of(2021, 8, 4, 0, 0, 0)),
                 new Event.Location(null),
                 new Event.BasePrice(0),
                 new Event.MaxPrice(0),
