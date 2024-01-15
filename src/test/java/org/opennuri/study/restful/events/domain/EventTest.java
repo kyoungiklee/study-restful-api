@@ -1,17 +1,18 @@
 package org.opennuri.study.restful.events.domain;
 
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.opennuri.study.restful.events.domain.Event;
-import org.opennuri.study.restful.events.domain.EventStatus;
+import org.springframework.test.context.ActiveProfiles;
 
-import java.sql.DataTruncation;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ActiveProfiles("test")
 class EventTest {
     @Test
+    @DisplayName("Event 생성 테스트")
     public void construct() {
         Event event = Event.from(
                 new Event.Id(1L),
@@ -33,6 +34,7 @@ class EventTest {
     }
 
     @Test
+    @DisplayName("javaBean 테스트")
     public void javaBean() {
         // Given
         String name = "Event";

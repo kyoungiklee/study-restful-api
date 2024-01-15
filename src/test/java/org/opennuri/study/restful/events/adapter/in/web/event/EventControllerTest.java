@@ -1,4 +1,4 @@
-package org.opennuri.study.restful.events.adapter.in.web;
+package org.opennuri.study.restful.events.adapter.in.web.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -30,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
+@ActiveProfiles("test")
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs // Spring REST Docs 사용
 @Import( {
@@ -83,7 +85,8 @@ class EventControllerTest {
                         links(
                                 linkWithRel("self").description("link to self"),
                                 linkWithRel("query-events").description("link to query events"),
-                                linkWithRel("update-event").description("link to update an existing event")
+                                linkWithRel("update-event").description("link to update an existing event"),
+                                linkWithRel("profile").description("link to profile")
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.ACCEPT).description("accept header"),
@@ -122,9 +125,9 @@ class EventControllerTest {
                                 fieldWithPath("status").description("Event status"),
                                 fieldWithPath("_links.self.href").description("link to self"),
                                 fieldWithPath("_links.query-events.href").description("link to query events"),
-                                fieldWithPath("_links.update-event.href").description("link to update an existing event"
-
-                        ))
+                                fieldWithPath("_links.update-event.href").description("link to update an existing event"),
+                                fieldWithPath("_links.profile.href").description("link to profile")
+                        )
                 )); // Spring REST Docs 사용
     }
 
@@ -199,11 +202,12 @@ class EventControllerTest {
                 ) // HAL (Hypertext Application Language) : RESTful API를 위한 JSON 기반의 데이터 포맷
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$[0].objectName").exists())
-                .andExpect(jsonPath("$[0].field").exists())
-                .andExpect(jsonPath("$[0].defaultMessage").exists())
-                .andExpect(jsonPath("$[0].code").exists())
-                .andExpect(jsonPath("$[0].rejectedValue").exists())
+                .andExpect(jsonPath("errors[0].objectName").exists())
+                .andExpect(jsonPath("errors[0].field").exists())
+                .andExpect(jsonPath("errors[0].defaultMessage").exists())
+                .andExpect(jsonPath("errors[0].code").exists())
+                .andExpect(jsonPath("errors[0].rejectedValue").exists())
+                .andExpect(jsonPath("_links.index").exists()) // 오류가 발생한 경우 이동할 수 있는 경로 정보를 제공한다.
         ;
     }
 

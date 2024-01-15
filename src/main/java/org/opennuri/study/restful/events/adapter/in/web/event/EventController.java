@@ -6,14 +6,14 @@ import org.modelmapper.ModelMapper;
 import org.opennuri.study.restful.common.annotation.WebAdapter;
 import org.opennuri.study.restful.events.adapter.in.web.event.dto.EventRequest;
 import org.opennuri.study.restful.events.adapter.in.web.event.dto.EventResponse;
-import org.opennuri.study.restful.events.adapter.in.web.event.resource.EventResource;
+import org.opennuri.study.restful.events.adapter.in.web.event.resource.ErrorsResource;
 import org.opennuri.study.restful.events.adapter.in.web.event.validator.EventRequestValidator;
 import org.opennuri.study.restful.events.application.port.in.EventCommand;
 import org.opennuri.study.restful.events.application.port.in.EventUseCase;
 import org.opennuri.study.restful.events.domain.Event;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.net.URI;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @WebAdapter
 @Controller
@@ -37,16 +36,19 @@ public class EventController {
     private final ModelMapper modelMapper;
     private final EventRequestValidator eventRequestValidator;
     @PostMapping
-    public ResponseEntity createEvent(@RequestBody @Valid EventRequest request, Errors errors) {
+    public ResponseEntity<EntityModel<EventResponse>> createEvent(@RequestBody @Valid EventRequest request, Errors errors) {
+
         // DTO 필드 검증
         if(errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors);
+            EventResponse response = getResponse(request, errors);
+            return ResponseEntity.badRequest().body(EntityModel.of(response));
         }
 
         // DTO 비즈니스 로직 검증
         eventRequestValidator.validate(request, errors);
         if(errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors);
+            EventResponse response = getResponse(request, errors);
+            return ResponseEntity.badRequest().body(EntityModel.of(response));
         }
 
         EventCommand command = modelMapper.map(request, EventCommand.class);
@@ -81,8 +83,27 @@ public class EventController {
         eventResource.add(linkTo(EventController.class).withRel("query-events"));
         // update-event라는 이름으로 이벤트를 수정할 수 있는 link를 추가한다.
         eventResource.add(linkTo(EventController.class).slash(event.getId()).withRel("update-event"));
+        //eventResource.add(new Link("/docs/index.html#resources-events-create").withRel("profile"));
+        eventResource.add(Link.of("/docs/index.html#resources-events-create").withRel("profile"));
 
         //Header에 Location 정보를 담아서 보내준다.
         return ResponseEntity.created(uri).body(eventResource);
+    }
+
+    private static EventResponse getResponse(EventRequest request, Errors errors) {
+        ErrorsResource errorsResource = new ErrorsResource(errors);
+        return EventResponse.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .beginEnrollmentDateTime(request.getBeginEnrollmentDateTime())
+                .closeEnrollmentDateTime(request.getCloseEnrollmentDateTime())
+                .beginEventDateTime(request.getBeginEventDateTime())
+                .endEventDateTime(request.getEndEventDateTime())
+                .location(request.getLocation())
+                .basePrice(request.getBasePrice())
+                .maxPrice(request.getMaxPrice())
+                .limitOfEnrollment(request.getLimitOfEnrollment())
+                .errors(errorsResource)
+                .build();
     }
 }
