@@ -1,5 +1,6 @@
-package org.opennuri.study.restful.events.adapter.in.web;
+package org.opennuri.study.restful.events.adapter.in.web.event.validator;
 
+import org.opennuri.study.restful.events.adapter.in.web.event.dto.EventRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 

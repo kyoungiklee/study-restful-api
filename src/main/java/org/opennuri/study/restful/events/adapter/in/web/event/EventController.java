@@ -1,9 +1,12 @@
-package org.opennuri.study.restful.events.adapter.in.web;
+package org.opennuri.study.restful.events.adapter.in.web.event;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.opennuri.study.restful.common.annotation.WebAdapter;
+import org.opennuri.study.restful.events.adapter.in.web.event.dto.EventRequest;
+import org.opennuri.study.restful.events.adapter.in.web.event.dto.EventResponse;
+import org.opennuri.study.restful.events.adapter.in.web.event.validator.EventRequestValidator;
 import org.opennuri.study.restful.events.application.port.in.EventCommand;
 import org.opennuri.study.restful.events.application.port.in.EventUseCase;
 import org.opennuri.study.restful.events.domain.Event;
@@ -30,30 +33,19 @@ public class EventController {
     private final ModelMapper modelMapper;
     private final EventRequestValidator eventRequestValidator;
     @PostMapping
-    public ResponseEntity<EventResponse> createEvent(@RequestBody @Valid EventRequest request, Errors errors) {
+    public ResponseEntity createEvent(@RequestBody @Valid EventRequest request, Errors errors) {
+        // DTO 필드 검증
         if(errors.hasErrors()) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(errors);
         }
 
+        // DTO 비즈니스 로직 검증
         eventRequestValidator.validate(request, errors);
         if(errors.hasErrors()) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(errors);
         }
 
         EventCommand command = modelMapper.map(request, EventCommand.class);
-
-        /*EventCommand command = EventCommand.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .beginEnrollmentDateTime(request.getBeginEnrollmentDateTime())
-                .closeEnrollmentDateTime(request.getCloseEnrollmentDateTime())
-                .beginEventDateTime(request.getBeginEventDateTime())
-                .endEventDateTime(request.getEndEventDateTime())
-                .location(request.getLocation())
-                .basePrice(request.getBasePrice())
-                .maxPrice(request.getMaxPrice())
-                .limitOfEnrollment(request.getLimitOfEnrollment())
-                .build();*/
 
         Event event = eventUseCase.createEvent(command);
 

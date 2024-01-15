@@ -1,36 +1,28 @@
-package org.opennuri.study.restful.events.adapter.in.web;
+package org.opennuri.study.restful.events.adapter.in.web.event.dto;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.opennuri.study.restful.events.domain.EventStatus;
 
 import java.time.LocalDateTime;
 
-@Builder
+
+@AllArgsConstructor @NoArgsConstructor
 @Getter @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class EventRequest {
+@Builder
+public class EventResponse {
 
-    @NotBlank
+    private  Long id;
     private  String name;
-    @NotBlank
     private  String description;
-    @NotNull
     private  LocalDateTime beginEnrollmentDateTime;
-    @NotNull
     private  LocalDateTime closeEnrollmentDateTime;
-    @NotNull
     private  LocalDateTime beginEventDateTime;
-    @NotNull
     private  LocalDateTime endEventDateTime;
-
     private  String location;
-    @Min(0)
     private  int basePrice;
-    @Min(0)
     private  int maxPrice;
-    @Min(0)
     private  int limitOfEnrollment;
+    private  boolean offline;
+    private  boolean free;
+    private  EventStatus status;
 }
